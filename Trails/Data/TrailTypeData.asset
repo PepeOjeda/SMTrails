@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fa732b98cb9ea5459eb90742fa4922d, type: 3}
+  m_Name: TrailTypeData
+  m_EditorClassIdentifier: 
+  bezierPrefab: {fileID: 5187693737811008089, guid: 3e3e160a284013843afc089ccdac9c87,
+    type: 3}
+  linearPrefab: {fileID: 8545148035103401157, guid: 9d4c8b6c3a3edbe4d9e84bcb62c2bd79,
+    type: 3}

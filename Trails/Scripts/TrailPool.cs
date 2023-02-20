@@ -2,23 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TrailPool : MonoBehaviour
+public class TrailPool
 {
-	[SerializeField] int poolSize;
+	readonly int POOL_SIZE = 20;
 	PooledTrail[] trailPool;
 
-	public static TrailPool instance;
-
-	void Awake()
-	{
-		if(instance && instance != this)
-		{
-			Destroy(instance);
+	private static TrailPool _instance;
+	public static TrailPool instance{ 
+		get{
+			if(_instance == null)
+				_instance = new TrailPool();
+			return _instance;
 		}
-		instance = this;
+	}
 
-		trailPool = new PooledTrail[poolSize];
-		for (int i = 0; i < poolSize; i++)
+	[RuntimeInitializeOnLoadMethod]
+	static void Initialize()
+	{
+		_instance = new TrailPool();
+	}
+
+	private TrailPool()
+	{
+		_instance = this;
+
+		trailPool = new PooledTrail[POOL_SIZE];
+		for (int i = 0; i < POOL_SIZE; i++)
 		{
 			trailPool[i] = new PooledTrail();
 		}
@@ -27,7 +36,7 @@ public class TrailPool : MonoBehaviour
 	public PooledTrail getObject()
 	{
 		int i = 0;
-		while(i<poolSize)
+		while(i<POOL_SIZE)
 		{
 			if(trailPool[i].isAvailable)
 			{
@@ -66,7 +75,7 @@ public class TrailPool : MonoBehaviour
 
 		~PooledTrail()
 		{
-			Destroy(go);
+			UnityEngine.Object.Destroy(go);
 		}
 	}
 }

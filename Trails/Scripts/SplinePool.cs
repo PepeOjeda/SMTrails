@@ -3,57 +3,58 @@ using System.Collections.Generic;
 using UnityEngine;
 using SplineMesh;
 
-public class SplinePool : MonoBehaviour
+public class SplinePool
 {
-	[SerializeField] GameObject linearTrailPrefab;
-	[SerializeField] GameObject bezierTrailPrefab;
-	public static SplinePool instance;
+	readonly int POOL_SIZE = 20;
+	
+	private static SplinePool _instance;
+	public static SplinePool instance{ 
+		get{
+			if(_instance == null)
+				_instance = new SplinePool();
+			return _instance;
+		}
+	}
 
 	
-	[SerializeField] int poolSize;
-	PooledSpline[] linearPool;
-	PooledSpline[] bezierPool;
+	List<PooledSpline> linearPool;
+	List<PooledSpline> bezierPool;
 
-	void Awake()
+	[RuntimeInitializeOnLoadMethod]
+	static void Initialize()
 	{
-		if(instance && instance != this)
-		{
-			Destroy(instance);
-		}
-		instance = this;
+		_instance = new SplinePool();
+	}
 
-		linearPool = new PooledSpline[poolSize];
-		bezierPool = new PooledSpline[poolSize];
+	private SplinePool()
+	{
+		_instance = this;
 
-		for (int i = 0; i < poolSize; i++)
+		linearPool = new List<PooledSpline>(POOL_SIZE);
+		bezierPool = new List<PooledSpline>(POOL_SIZE);
+
+		for (int i = 0; i < POOL_SIZE; i++)
 		{
-			linearPool[i] = new PooledSpline(linearTrailPrefab);
-			bezierPool[i] = new PooledSpline(bezierTrailPrefab);
+			linearPool.Add( new PooledSpline(TrailTypeData.instance.getPrefab(TrailMaker.TrailType.Linear)) );
+			bezierPool.Add( new PooledSpline(TrailTypeData.instance.getPrefab(TrailMaker.TrailType.Bezier)) );
 		}
 	}
 
 	public PooledSpline getObject(TrailMaker.TrailType trailType)
 	{
 		int i = 0;
-		PooledSpline[] pool = null;
-		GameObject prefab = null;
+		List<PooledSpline> pool = null;
 		if(trailType == TrailMaker.TrailType.Linear)
-		{
 			pool = linearPool;
-			prefab = linearTrailPrefab;
-		}
 		else if (trailType == TrailMaker.TrailType.Bezier)
-		{
 			pool = bezierPool;
-			prefab = bezierTrailPrefab;
-		}
 		else
 		{
 			Debug.LogError($"Trail type not recognized: {trailType}");
 			return null;
 		}
 
-		while(i<poolSize)
+		while(i<POOL_SIZE)
 		{
 			if(pool[i].isAvailable)
 			{
@@ -63,7 +64,8 @@ public class SplinePool : MonoBehaviour
 			i++;
 		}
 		Debug.LogWarning("Pool size exceeded!");
-		var o = new PooledSpline(prefab);
+		var o = new PooledSpline(TrailTypeData.instance.getPrefab(trailType));
+		pool.Add(o);
 		o.isAvailable = false;
 		return o;
 	}	
@@ -91,7 +93,7 @@ public class SplinePool : MonoBehaviour
 
 		public PooledSpline(GameObject prefab)
 		{
-			gameObject = Instantiate(prefab);
+			gameObject = UnityEngine.Object.Instantiate(prefab);
 			spline = gameObject.GetComponent<Spline>();
 			splineMeshTiling = gameObject.GetComponent<SplineMeshTiling>();
 			splineSmoother = gameObject.GetComponent<SplineSmoother>();
@@ -102,7 +104,7 @@ public class SplinePool : MonoBehaviour
 		
 		~PooledSpline()
 		{
-			Destroy(gameObject);
+			UnityEngine.Object.Destroy(gameObject);
 		}
 
 		void Disable()
