@@ -15,8 +15,20 @@ public class TrailTypeData :ScriptableObject
 			return _instance;
 		}
 	}
-	private static event Action refreshInstance;
-
+#if UNITY_EDITOR
+	[UnityEditor.InitializeOnLoadMethod]
+	static void OnEditorStartup()
+	{
+		var preloadedAssets = UnityEditor.PlayerSettings.GetPreloadedAssets().ToList();
+		var trailtypedatas =preloadedAssets.Where(asset => asset is TrailTypeData).ToList();	
+		if (trailtypedatas.Count == 1)
+			(trailtypedatas[0] as TrailTypeData).OnEnable();
+		else if(trailtypedatas.Count>1)			
+			Debug.LogError("More than one instance of TrailTypeData in the project!");
+		else
+			Debug.LogError("No instance of TrailTypeData found in the project!");
+	}
+#endif
 	[SerializeField] GameObject bezierPrefab;
 	[SerializeField] GameObject linearPrefab;
 
@@ -35,7 +47,7 @@ public class TrailTypeData :ScriptableObject
         UnityEditor.PlayerSettings.SetPreloadedAssets(preloadedAssets.ToArray());
 #endif
 		_instance = this;
-
+		Debug.Log("TrailTypeData initialized");
 	}
 
 	public GameObject getPrefab(TrailMaker.TrailType type)
