@@ -68,6 +68,7 @@ public class TrailPool
 		{
 			go = new GameObject();
 			go.hideFlags = HideFlags.HideInHierarchy;
+            Object.DontDestroyOnLoad(go);
 			trail = go.AddComponent<BasicSplineTrail>();
 			trail.pooledTrailMaker = this;
 			isAvailable = true;

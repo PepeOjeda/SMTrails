@@ -94,6 +94,7 @@ public class SplinePool
 		public PooledSpline(GameObject prefab)
 		{
 			gameObject = UnityEngine.Object.Instantiate(prefab);
+            UnityEngine.Object.DontDestroyOnLoad(gameObject);
 			spline = gameObject.GetComponent<Spline>();
 			splineMeshTiling = gameObject.GetComponent<SplineMeshTiling>();
 			splineSmoother = gameObject.GetComponent<SplineSmoother>();
